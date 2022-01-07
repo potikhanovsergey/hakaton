@@ -50,22 +50,39 @@ body {
     background-color: lightgreen;
 }
 
-.santa-cell {
-    background-color: purple;
-}
 
 
 .death {
     background-color: black;
 }
 
-.santa {
-    background-color: orange;
+.clickable {
+    cursor: pointer;
+    position: relative;
 }
+
+.clickable::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    content: '';
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+
+
+.santa {
+    background-color: purple;
+}
+
 
 .game {
     position: relative;
 }
+
+
 
 .controls {
     position: fixed;
@@ -77,4 +94,8 @@ body {
     max-width: 400px;
     min-height: 100px;
 
+}
+
+.conrols::hover {
+    display: none;
 }

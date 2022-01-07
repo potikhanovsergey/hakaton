@@ -9,20 +9,26 @@
 </head>
 <body>
     <div class="game">
-        <div id="map">
-
-        </div>
+        <div id="map"></div>
         <div class="controls">
-            <button id="N">⬆</button>
-            <button id="S">⬇</button>
-            <button id="W">←</button>
-            <button id="E">→</button>
-            <button id="NW">↖</button>
-            <button id="NE">↗</button>
-            <button id="SW">↙</button>
-            <button id="SE">↘</button>
+            <div class="vector-wrapper">Вектор скорости <span id="vector"></span></div>
+            <div class="radius-wrapper">Радиус <span id="radius"></span></div>
+            <div class="santa-wrapper">Деанон санты <span id="santa"></span></div>
+            <div class="gifts-wrapper">Подарки <span id="gifts"></span></div>
+            <div class="steps-wrapper">Шаги <span id="steps"></span></div>
+            <div class="points-wrapper">Очки <span id="points"></span></div>
         </div>
     </div>
+    <div id="gameover" class="modal">
+        <p>Thanks for clicking. That felt good.</p>
+        <a href="#" rel="modal:close">Close</a>
+    </div>
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <script src="kek.js"></script>
 </body>
 </html>
