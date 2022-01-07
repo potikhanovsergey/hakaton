@@ -743,5 +743,9 @@ $(".cell").on("click", function () {
 
 $('#copy-json').on('click', function() {
     let data = JSON.stringify(result);
-    navigator.clipboard.writeText(data);
+    let $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val(data).select();
+    document.execCommand("copy");
+    $temp.remove();
 });
