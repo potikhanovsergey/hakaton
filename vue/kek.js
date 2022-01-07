@@ -685,6 +685,9 @@ function moveSanta(x, y) {
     $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
     map[y][x] = 2;
     $(html_map.childNodes[y].childNodes[x]).addClass("road");
+    if (!$('.gift').length) {
+        $("#gameover").modal();
+    }
   }
   $("#points")[0].innerHTML = (3600 * Math.pow(1.1, gifts)) / steps;
 }
