@@ -216,10 +216,9 @@ function clearClickable() {
     $('.clickable').removeClass('clickable');
 }
 
-$('#gameover').on('hidden.bs.modal', function() {
-    console.log('close');
+$(document).on($.modal.CLOSE, () => {
+    location.reload();
 });
-
 
 
 function getMovements() {

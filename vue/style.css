@@ -86,16 +86,13 @@ body {
 
 .controls {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    bottom: 0;
+    left: 0;
     background-color: white;
     border: 1px solid black;
     min-width: 100px;
     max-width: 400px;
     min-height: 100px;
+    height: auto;
 
-}
-
-.conrols::hover {
-    display: none;
 }
