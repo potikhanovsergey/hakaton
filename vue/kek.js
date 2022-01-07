@@ -690,14 +690,13 @@ function moveSanta(x, y) {
 }
 
 function makeClickable() {
-  $(":button").prop("disabled", true); // Disable all the buttons
+  $(".cell").prop("disabled", true); // Disable all the buttons
   const size = radius * 2 + 1;
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       let cell =
-        html_map.childNodes[santaY - radius + vector[1] + i].childNodes[
-          santaX - radius + vector[0] + j
-        ];
+        html_map?.childNodes[santaY - radius + vector[1] + i]
+        ?.childNodes[santaX - radius + vector[0] + j];
       if (
         cell &&
         map[cell.getAttribute("data-y")][cell.getAttribute("data-x")] !== 9
@@ -740,4 +739,9 @@ $(".cell").on("click", function () {
   radius = RADIUS[map[santaY][santaX]];
   html_radius.innerHTML = radius;
   makeClickable();
+});
+
+$('#copy-json').on('click', function() {
+    let data = JSON.stringify(result);
+    navigator.clipboard.writeText(data);
 });
