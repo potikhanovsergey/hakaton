@@ -638,8 +638,6 @@ INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
 
 history.push(JSON.parse(JSON.stringify(INFORMATION)));
 
-console.log(history);
-
 function createBlock(item, y, x) {
   let div = document.createElement("button");
   div.setAttribute("data-x", x);
@@ -766,7 +764,6 @@ $(document).on($.modal.CLOSE, () => {
 });
 
 $(document).on($.modal.OPEN, () => {
-  console.log(JSON.stringify(result));
   //location.reload();
 });
 
@@ -779,7 +776,6 @@ function updateStats() {
   $("#gifts")[0].innerHTML = INFORMATION.gifts;
   html_radius.innerHTML = INFORMATION.radius;
   html_vector.innerHTML = INFORMATION.vector;
-  console.log("updated");
 }
 
 $(".cell").on("click", function () {
@@ -846,11 +842,12 @@ $("#redo").on("click", function () {
       INFORMATION.santaX
     ].classList.add("santa");
     makeClickable();
-    const wasGift = INFORMATION.gifts - startGifts >= 0;
+    const wasGift = INFORMATION.gifts - startGifts > 0;
+    console.log(wasGift);
     if (wasGift) {
-      $(html_map.childNodes[y].childNodes[x]).addClass("road");
+      $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).addClass("road");
       map[y][x] = 2;
-      $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
+      $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).removeClass("gift");
     }
   }
 });
