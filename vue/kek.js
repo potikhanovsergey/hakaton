@@ -621,19 +621,18 @@ let gifts = 0;
 let points = 0;
 let steps = 0;
 
-
 let history = [];
 let stepInHistory = 0;
 
 let INFORMATION = {
-    santaX: 57,
-    santaY: 49,
-    vector: [0, 0],
-    gifts: 0,
-    points: 0,
-    steps: 0,
-    radius: null
-}
+  santaX: 57,
+  santaY: 49,
+  vector: [0, 0],
+  gifts: 0,
+  points: 0,
+  steps: 0,
+  radius: null,
+};
 
 INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
 
@@ -691,11 +690,12 @@ $("#steps")[0].innerHTML = INFORMATION.steps;
 makeClickable();
 gameHasStarted = true;
 
-
 function moveSanta(x, y) {
   html_map?.childNodes[y]?.childNodes[x]?.classList?.add("santa");
   if (!(x == INFORMATION.santaX && y == INFORMATION.santaY)) {
-    html_map?.childNodes[INFORMATION.santaY]?.childNodes[INFORMATION.santaX]?.classList?.remove("santa");
+    html_map?.childNodes[INFORMATION.santaY]?.childNodes[
+      INFORMATION.santaX
+    ]?.classList?.remove("santa");
   }
 
   INFORMATION.santaX = +x;
@@ -708,21 +708,25 @@ function moveSanta(x, y) {
     $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
     map[y][x] = 2;
     $(html_map.childNodes[y].childNodes[x]).addClass("road");
-    if (!$('.gift').length) {
-        $("#gameover").modal();
+    if (!$(".gift").length) {
+      $("#gameover").modal();
     }
   }
-  $("#points")[0].innerHTML = (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps; // undo
-  INFORMATION.points = (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps;
+  $("#points")[0].innerHTML =
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps; // undo
+  INFORMATION.points =
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps;
   history = history.slice(0, stepInHistory + 1);
+  INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+  html_radius.innerHTML = INFORMATION.radius;
   history.push({
-      santaX: INFORMATION.santaX,
-      santaY: INFORMATION.santaY,
-      vector: [...INFORMATION.vector],
-      gifts: INFORMATION.gifts,
-      points: INFORMATION.points,
-      steps: INFORMATION.steps,
-      radius: INFORMATION.radius
+    santaX: INFORMATION.santaX,
+    santaY: INFORMATION.santaY,
+    vector: [...INFORMATION.vector],
+    gifts: INFORMATION.gifts,
+    points: INFORMATION.points,
+    steps: INFORMATION.steps,
+    radius: INFORMATION.radius,
   });
   stepInHistory = history.length - 1;
 }
@@ -733,8 +737,11 @@ function makeClickable() {
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       let cell =
-        html_map?.childNodes[INFORMATION.santaY - INFORMATION.radius + INFORMATION.vector[1] + i]
-        ?.childNodes[INFORMATION.santaX - INFORMATION.radius + INFORMATION.vector[0] + j];
+        html_map?.childNodes[
+          INFORMATION.santaY - INFORMATION.radius + INFORMATION.vector[1] + i
+        ]?.childNodes[
+          INFORMATION.santaX - INFORMATION.radius + INFORMATION.vector[0] + j
+        ];
       if (
         cell &&
         map[cell.getAttribute("data-y")][cell.getAttribute("data-x")] !== 9
@@ -763,15 +770,16 @@ $(document).on($.modal.OPEN, () => {
   //location.reload();
 });
 
-
 function updateStats() {
-    $("#steps")[0].innerHTML = INFORMATION.steps;
-    $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
-    $("#points")[0].innerHTML = INFORMATION.steps ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps : 0; // undo
-    $("#gifts")[0].innerHTML = INFORMATION.gifts;
-    html_radius.innerHTML = INFORMATION.radius;
-    html_vector.innerHTML = INFORMATION.vector;
-    console.log('updated');
+  $("#steps")[0].innerHTML = INFORMATION.steps;
+  $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
+  $("#points")[0].innerHTML = INFORMATION.steps
+    ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps
+    : 0; // undo
+  $("#gifts")[0].innerHTML = INFORMATION.gifts;
+  html_radius.innerHTML = INFORMATION.radius;
+  html_vector.innerHTML = INFORMATION.vector;
+  console.log("updated");
 }
 
 $(".cell").on("click", function () {
@@ -784,18 +792,16 @@ $(".cell").on("click", function () {
   clearClickable();
   INFORMATION.steps += 1;
   moveSanta(x, y);
-  INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
-  html_radius.innerHTML = INFORMATION.radius;
   makeClickable();
 });
 
-$('#copy-json, #json').on('click', function() {
-    let data = JSON.stringify(result);
-    let $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val(data).select();
-    document.execCommand("copy");
-    $temp.remove();
+$("#copy-json, #json").on("click", function () {
+  let data = JSON.stringify(result);
+  let $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val(data).select();
+  document.execCommand("copy");
+  $temp.remove();
 });
 
 $("#undo").on("click", function () {
@@ -824,7 +830,6 @@ $("#undo").on("click", function () {
   }
 });
 
-
 $("#redo").on("click", function () {
   if (stepInHistory < history.length - 1) {
     let y = INFORMATION.santaY;
@@ -850,23 +855,22 @@ $("#redo").on("click", function () {
   }
 });
 
-const input = $('#json-input');
-const inputBtn = $('#json-btn');
+const input = $("#json-input");
+const inputBtn = $("#json-btn");
 
-inputBtn.on('click', function() {
+inputBtn.on("click", function () {
   let path = JSON.parse(input.val()).path;
   history = [];
   stepInHistory = 0;
   INFORMATION = {
-      santaX: 57,
-      santaY: 49,
-      vector: [0, 0],
-      gifts: 0,
-      points: 0,
-      steps: 0,
-      radius: null
-  }
-  
+    santaX: 57,
+    santaY: 49,
+    vector: [0, 0],
+    gifts: 0,
+    points: 0,
+    steps: 0,
+    radius: null,
+  };
 
   INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
   history.push(JSON.parse(JSON.stringify(INFORMATION)));
@@ -878,7 +882,7 @@ inputBtn.on('click', function() {
     INFORMATION.vector[1] = y - INFORMATION.santaY;
     result.path.push([...INFORMATION.vector]);
     INFORMATION.steps += 1;
-    stepInHistory+= 1;
+    stepInHistory += 1;
     moveSanta(x, y);
     INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
     html_radius.innerHTML = INFORMATION.radius;
@@ -886,6 +890,4 @@ inputBtn.on('click', function() {
   clearClickable();
   makeClickable();
   updateStats();
-
-})
-
+});
