@@ -117,18 +117,23 @@ body {
     cursor: pointer;
 }
 
-.input-wrapper {
+.input-wrapper, .improve-inputs {
     display: flex;
     gap: 5px;
 }
 
-#json-btn {
+#json-btn, #improve-btn {
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
+    margin-left: auto;
 }
 
 #json-input {
     padding: 2px 4px;
+}
+
+.improve-input {
+    max-width: 50px;
 }

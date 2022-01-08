@@ -611,6 +611,8 @@ let clickableArea = [];
 
 const RADIUS = { 9: -1, 0: 0, 1: 1, 2: 2, 4: 2, 3: 2 };
 
+const NUMBER_TO_CELL = {9: "death", 0: "ice", 1: "snow", 2: "road", 3: "road"}
+
 santaX = 57;
 santaY = 49;
 
@@ -632,6 +634,9 @@ let INFORMATION = {
   points: 0,
   steps: 0,
   radius: null,
+  improves: 0,
+  map: [...map].map((arr) => arr.slice()),
+  result: { job: [], path: [] },
 };
 
 INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
@@ -665,6 +670,32 @@ function createBlock(item, y, x) {
   return div;
 }
 
+function drawMap() {
+  for (let i in INFORMATION.map) {
+    for (let j in INFORMATION.map) {
+      let item = INFORMATION.map[j][i];
+      switch (item) {
+        case 0:
+          html_map.childNodes[j].childNodes[i].className = "cell ice";
+          break;
+        case 1:
+          html_map.childNodes[j].childNodes[i].className = "cell snow";
+          break;
+        case 2:
+          html_map.childNodes[j].childNodes[i].className = "cell road";
+          break;
+        case 4:
+          html_map.childNodes[j].childNodes[i].className = "cell gift";
+          break;
+        case 9:
+          html_map.childNodes[j].childNodes[i].className = "cell death";
+      }
+    }
+  }
+  makeClickable();
+  html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX].className = "cell santa";
+}
+
 for (let i in map) {
   let row = document.createElement("div");
   row.className = "row";
@@ -684,6 +715,7 @@ html_vector.innerHTML = INFORMATION.vector;
 $("#gifts")[0].innerHTML = INFORMATION.gifts;
 $("#points")[0].innerHTML = INFORMATION.points;
 $("#steps")[0].innerHTML = INFORMATION.steps;
+$("#improves")[0].innerHTML = INFORMATION.improves;
 
 makeClickable();
 gameHasStarted = true;
@@ -694,28 +726,31 @@ function moveSanta(x, y) {
     html_map?.childNodes[INFORMATION.santaY]?.childNodes[
       INFORMATION.santaX
     ]?.classList?.remove("santa");
+    html_map?.childNodes[INFORMATION.santaY]?.childNodes[
+      INFORMATION.santaX
+    ]?.classList?.add(NUMBER_TO_CELL[INFORMATION.map[INFORMATION.santaY][INFORMATION.santaX]]);
   }
 
   INFORMATION.santaX = +x;
   INFORMATION.santaY = +y;
   $("#steps")[0].innerHTML = INFORMATION.steps;
   $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
-  if (map[y][x] === 4) {
+  if (INFORMATION.map[y][x] === 4) {
     INFORMATION.gifts += 1;
     $("#gifts")[0].innerHTML = INFORMATION.gifts;
     $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
-    map[y][x] = 2;
+    INFORMATION.map[y][x] = 2;
     $(html_map.childNodes[y].childNodes[x]).addClass("road");
     if (!$(".gift").length) {
       $("#gameover").modal();
     }
   }
   $("#points")[0].innerHTML =
-    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps; // undo
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / (INFORMATION.steps + INFORMATION.improves); // undo
   INFORMATION.points =
-    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps;
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / (INFORMATION.steps + INFORMATION.improves);
   history = history.slice(0, stepInHistory + 1);
-  INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+  INFORMATION.radius = RADIUS[INFORMATION.map[INFORMATION.santaY][INFORMATION.santaX]];
   html_radius.innerHTML = INFORMATION.radius;
   history.push({
     santaX: INFORMATION.santaX,
@@ -725,6 +760,9 @@ function moveSanta(x, y) {
     points: INFORMATION.points,
     steps: INFORMATION.steps,
     radius: INFORMATION.radius,
+    improves: INFORMATION.improves,
+    map: [...INFORMATION.map].map((arr) => arr.slice()),
+    result: JSON.parse(JSON.stringify(INFORMATION.result))
   });
   stepInHistory = history.length - 1;
 }
@@ -742,7 +780,7 @@ function makeClickable() {
         ];
       if (
         cell &&
-        map[cell.getAttribute("data-y")][cell.getAttribute("data-x")] !== 9
+        INFORMATION.map[cell.getAttribute("data-y")][cell.getAttribute("data-x")] !== 9
       ) {
         $(cell).addClass("clickable");
         $(cell)[0].removeAttribute("disabled");
@@ -771,9 +809,10 @@ function updateStats() {
   $("#steps")[0].innerHTML = INFORMATION.steps;
   $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
   $("#points")[0].innerHTML = INFORMATION.steps
-    ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps
+    ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / (INFORMATION.steps + INFORMATION.improves)
     : 0; // undo
   $("#gifts")[0].innerHTML = INFORMATION.gifts;
+  $("#improves")[0].innerHTML = INFORMATION.improves;
   html_radius.innerHTML = INFORMATION.radius;
   html_vector.innerHTML = INFORMATION.vector;
 }
@@ -784,7 +823,8 @@ $(".cell").on("click", function () {
   INFORMATION.vector[0] = x - INFORMATION.santaX;
   INFORMATION.vector[1] = y - INFORMATION.santaY;
   html_vector.innerHTML = INFORMATION.vector;
-  result.path.push([...INFORMATION.vector]);
+  // result.path.push([...INFORMATION.vector]);
+  INFORMATION.result.path.push([...INFORMATION.vector]);
   clearClickable();
   INFORMATION.steps += 1;
   moveSanta(x, y);
@@ -792,7 +832,7 @@ $(".cell").on("click", function () {
 });
 
 $("#copy-json, #json").on("click", function () {
-  let data = JSON.stringify(result);
+  let data = JSON.stringify(INFORMATION.result);
   let $temp = $("<input>");
   $("body").append($temp);
   $temp.val(data).select();
@@ -809,20 +849,20 @@ $("#undo").on("click", function () {
     const vector = [...history[stepInHistory].vector];
     INFORMATION = { ...history[stepInHistory], vector };
     const wasGift = startGifts - INFORMATION.gifts > 0;
-    result.path.pop();
+    // result.path.pop();
     updateStats();
     clearClickable();
     if (wasGift) {
       $(html_map.childNodes[y].childNodes[x]).addClass("gift");
-      map[y][x] = 4;
+      INFORMATION.map[y][x] = 4;
       $(html_map.childNodes[y].childNodes[x]).removeClass("road");
     }
-
     html_map.childNodes[y].childNodes[x].classList.remove("santa");
     html_map.childNodes[INFORMATION.santaY].childNodes[
       INFORMATION.santaX
     ].classList.add("santa");
     makeClickable();
+    drawMap();
   }
 });
 
@@ -834,7 +874,7 @@ $("#redo").on("click", function () {
     const startGifts = INFORMATION.gifts;
     const vector = [...history[stepInHistory].vector];
     INFORMATION = { ...history[stepInHistory], vector };
-    result.path.push([...INFORMATION.vector]);
+    // result.path.push([...INFORMATION.vector]);
     updateStats();
     clearClickable();
     html_map.childNodes[y].childNodes[x].classList.remove("santa");
@@ -846,9 +886,10 @@ $("#redo").on("click", function () {
     console.log(wasGift);
     if (wasGift) {
       $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).addClass("road");
-      map[y][x] = 2;
+      INFORMATION.map[y][x] = 2;
       $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).removeClass("gift");
     }
+    drawMap();
   }
 });
 
@@ -857,6 +898,7 @@ const inputBtn = $("#json-btn");
 
 inputBtn.on("click", function () {
   let path = JSON.parse(input.val()).path;
+  let job = JSON.parse(input.val()).job;
   history = [];
   stepInHistory = 0;
   INFORMATION = {
@@ -867,11 +909,17 @@ inputBtn.on("click", function () {
     points: 0,
     steps: 0,
     radius: null,
+    improves: 0,
+    map: [...map].map((arr) => arr.slice()),
+    result: { job: [], path: [] }
   };
 
-  INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+  INFORMATION.radius = RADIUS[INFORMATION.map[INFORMATION.santaY][INFORMATION.santaX]];
   history.push(JSON.parse(JSON.stringify(INFORMATION)));
   result = { job: [], path: [] };
+  for (let i = 0; i < job.length; i++) {
+    improveCell(job[i][0], job[i][1]);
+  }
   for (let i = 0; i < path.length; i++) {
     let x = INFORMATION.santaX + path[i][0];
     let y = INFORMATION.santaY + path[i][1];
@@ -881,10 +929,52 @@ inputBtn.on("click", function () {
     INFORMATION.steps += 1;
     stepInHistory += 1;
     moveSanta(x, y);
-    INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+    INFORMATION.radius = RADIUS[INFORMATION.map[INFORMATION.santaY][INFORMATION.santaX]];
     html_radius.innerHTML = INFORMATION.radius;
   }
   clearClickable();
   makeClickable();
   updateStats();
 });
+
+const improveBtn = $('#improve-btn');
+const improveX = $('#improve-x');
+const improveY = $('#improve-y');
+
+
+$('#improve-btn').on('click', function() {
+  let x = improveX.val();
+  let y = improveY.val();
+  improveCell(x, y);
+});
+
+
+function improveCell(x, y) {
+  if (INFORMATION.map[y][x] === 0 || INFORMATION.map[y][x] === 1) {
+    if (INFORMATION.map[y][x] === 0) {
+      INFORMATION.map[y][x] = 1;
+      $(html_map.childNodes[y].childNodes[x]).removeClass('ice');
+      $(html_map.childNodes[y].childNodes[x]).addClass('snow');
+    } else {
+      INFORMATION.map[y][x] = 2;
+      $(html_map.childNodes[y].childNodes[x]).removeClass('snow');
+      $(html_map.childNodes[y].childNodes[x]).addClass('road');
+    }
+    INFORMATION.improves += 1;
+    INFORMATION.result.job.push([x, y]);
+    $("#improves")[0].innerHTML = INFORMATION.improves;
+    history.push({
+      santaX: INFORMATION.santaX,
+      santaY: INFORMATION.santaY,
+      vector: [...INFORMATION.vector],
+      gifts: INFORMATION.gifts,
+      points: INFORMATION.points,
+      steps: INFORMATION.steps,
+      radius: INFORMATION.radius,
+      improves: INFORMATION.improves,
+      map: [...INFORMATION.map].map((arr) => arr.slice()),
+      result: JSON.parse(JSON.stringify(INFORMATION.result))
+    });
+    stepInHistory = history.length - 1;
+  }
+}
