@@ -605,7 +605,7 @@ const html_map = document.getElementById("map");
 const html_vector = document.getElementById("vector");
 const html_radius = document.getElementById("radius");
 const santa = document.createElement("div");
-const result = { job: [], path: [] };
+let result = { job: [], path: [] };
 santa.className = "santa";
 let clickableArea = [];
 
@@ -693,8 +693,8 @@ gameHasStarted = true;
 
 
 function moveSanta(x, y) {
-  html_map.childNodes[y].childNodes[x].classList.add("santa");
-  html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX].classList.remove("santa");
+  html_map?.childNodes[y]?.childNodes[x]?.classList?.add("santa");
+  html_map?.childNodes[INFORMATION.santaY]?.childNodes[INFORMATION.santaX]?.classList?.remove("santa");
 
   INFORMATION.santaX = +x;
   INFORMATION.santaY = +y;
@@ -824,29 +824,66 @@ $("#undo").on("click", function () {
 
 
 $("#redo").on("click", function () {
-  if (stepInHistory < history.length) {
+  if (stepInHistory < history.length - 1) {
     let y = INFORMATION.santaY;
     let x = INFORMATION.santaX;
     stepInHistory += 1;
     const startGifts = INFORMATION.gifts;
     const vector = [...history[stepInHistory].vector];
     INFORMATION = { ...history[stepInHistory], vector };
-    const wasGift = startGifts - INFORMATION.gifts > 0;
     result.path.push([...INFORMATION.vector]);
     updateStats();
     clearClickable();
-    if (wasGift) {
-      $(html_map.childNodes[y].childNodes[x]).addClass("gift");
-      map[y][x] = 4;
-      $(html_map.childNodes[y].childNodes[x]).removeClass("road");
-    }
-
     html_map.childNodes[y].childNodes[x].classList.remove("santa");
     html_map.childNodes[INFORMATION.santaY].childNodes[
       INFORMATION.santaX
     ].classList.add("santa");
     makeClickable();
+    const wasGift = INFORMATION.gifts - startGifts > 0;
+    if (wasGift) {
+      $(html_map.childNodes[y].childNodes[x]).addClass("road");
+      map[y][x] = 4;
+      $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
+    }
   }
 });
 
+const input = $('#json-input');
+const inputBtn = $('#json-btn');
+
+inputBtn.on('click', function() {
+  let path = JSON.parse(input.val()).path;
+  history = [];
+  stepInHistory = 0;
+  INFORMATION = {
+      santaX: 57,
+      santaY: 49,
+      vector: [0, 0],
+      gifts: 0,
+      points: 0,
+      steps: 0,
+      radius: null
+  }
+  
+
+  INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+  history.push(JSON.parse(JSON.stringify(INFORMATION)));
+  result = { job: [], path: [] };
+  for (let i = 0; i < path.length; i++) {
+    let x = INFORMATION.santaX + path[i][0];
+    let y = INFORMATION.santaY + path[i][1];
+    INFORMATION.vector[0] = x - INFORMATION.santaX;
+    INFORMATION.vector[1] = y - INFORMATION.santaY;
+    result.path.push([...INFORMATION.vector]);
+    INFORMATION.steps += 1;
+    stepInHistory+= 1;
+    moveSanta(x, y);
+    INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+    html_radius.innerHTML = INFORMATION.radius;
+  }
+  clearClickable();
+  makeClickable();
+  updateStats();
+
+})
 

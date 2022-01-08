@@ -114,4 +114,21 @@ body {
     background: none;
     border: none;
     font-size: 32px;
+    cursor: pointer;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+#json-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#json-input {
+    padding: 2px 4px;
 }
