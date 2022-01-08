@@ -846,7 +846,7 @@ $("#redo").on("click", function () {
       INFORMATION.santaX
     ].classList.add("santa");
     makeClickable();
-    const wasGift = INFORMATION.gifts - startGifts > 0;
+    const wasGift = INFORMATION.gifts - startGifts >= 0;
     if (wasGift) {
       $(html_map.childNodes[y].childNodes[x]).addClass("road");
       map[y][x] = 2;
