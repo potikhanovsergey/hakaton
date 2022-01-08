@@ -694,7 +694,9 @@ gameHasStarted = true;
 
 function moveSanta(x, y) {
   html_map?.childNodes[y]?.childNodes[x]?.classList?.add("santa");
-  html_map?.childNodes[INFORMATION.santaY]?.childNodes[INFORMATION.santaX]?.classList?.remove("santa");
+  if (!(x == INFORMATION.santaX && y == INFORMATION.santaY)) {
+    html_map?.childNodes[INFORMATION.santaY]?.childNodes[INFORMATION.santaX]?.classList?.remove("santa");
+  }
 
   INFORMATION.santaX = +x;
   INFORMATION.santaY = +y;
@@ -842,7 +844,7 @@ $("#redo").on("click", function () {
     const wasGift = INFORMATION.gifts - startGifts > 0;
     if (wasGift) {
       $(html_map.childNodes[y].childNodes[x]).addClass("road");
-      map[y][x] = 4;
+      map[y][x] = 2;
       $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
     }
   }
