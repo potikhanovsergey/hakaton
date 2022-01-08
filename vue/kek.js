@@ -787,7 +787,7 @@ $(".cell").on("click", function () {
   makeClickable();
 });
 
-$('#copy-json').on('click', function() {
+$('#copy-json, #json').on('click', function() {
     let data = JSON.stringify(result);
     let $temp = $("<input>");
     $("body").append($temp);
@@ -806,7 +806,6 @@ $("#undo").on("click", function () {
     INFORMATION = { ...history[stepInHistory], vector };
     const wasGift = startGifts - INFORMATION.gifts > 0;
     result.path.pop();
-    console.log();
     updateStats();
     clearClickable();
     if (wasGift) {
@@ -822,3 +821,32 @@ $("#undo").on("click", function () {
     makeClickable();
   }
 });
+
+
+$("#redo").on("click", function () {
+  if (stepInHistory < history.length) {
+    let y = INFORMATION.santaY;
+    let x = INFORMATION.santaX;
+    stepInHistory += 1;
+    const startGifts = INFORMATION.gifts;
+    const vector = [...history[stepInHistory].vector];
+    INFORMATION = { ...history[stepInHistory], vector };
+    const wasGift = startGifts - INFORMATION.gifts > 0;
+    result.path.push([...INFORMATION.vector]);
+    updateStats();
+    clearClickable();
+    if (wasGift) {
+      $(html_map.childNodes[y].childNodes[x]).addClass("gift");
+      map[y][x] = 4;
+      $(html_map.childNodes[y].childNodes[x]).removeClass("road");
+    }
+
+    html_map.childNodes[y].childNodes[x].classList.remove("santa");
+    html_map.childNodes[INFORMATION.santaY].childNodes[
+      INFORMATION.santaX
+    ].classList.add("santa");
+    makeClickable();
+  }
+});
+
+
