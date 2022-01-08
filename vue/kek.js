@@ -753,7 +753,7 @@ function clearClickable() {
 
 $(document).on($.modal.CLOSE, () => {
   //console.log(JSON.stringify(result));
-  location.reload();
+  //location.reload();
 });
 
 $(document).on($.modal.OPEN, () => {
@@ -814,12 +814,20 @@ $("#undo").on("click", function () {
     let y = INFORMATION.santaY;
     let x = INFORMATION.santaX;
     stepInHistory -= 1;
+    const startGifts = INFORMATION.gifts;
     const vector = [...history[stepInHistory].vector];
     INFORMATION = { ...history[stepInHistory], vector };
+    const wasGift = startGifts - INFORMATION.gifts > 0;
     result.path.pop();
     console.log();
     updateStats();
     clearClickable();
+    if (wasGift) {
+      $(html_map.childNodes[y].childNodes[x]).addClass("gift");
+      map[y][x] = 4;
+      $(html_map.childNodes[y].childNodes[x]).removeClass("road");
+    }
+
     html_map.childNodes[y].childNodes[x].classList.remove("santa");
     html_map.childNodes[INFORMATION.santaY].childNodes[
       INFORMATION.santaX
