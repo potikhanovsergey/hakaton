@@ -621,19 +621,20 @@ let gifts = 0;
 let points = 0;
 let steps = 0;
 
-
 let history = [];
 let stepInHistory = 0;
 
 let INFORMATION = {
-    santaX: 57,
-    santaY: 49,
-    vector: [0, 0],
-    gifts: 0,
-    points: 0,
-    steps: 0,
-    radius: null
-}
+  santaX: 57,
+  santaY: 49,
+  vector: [0, 0],
+  gifts: 0,
+  points: 0,
+  steps: 0,
+  radius: null,
+};
+
+//let INFORMATION;
 
 INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
 
@@ -679,7 +680,7 @@ for (let i in map) {
 }
 
 radius = RADIUS[map[santaY][santaX]]; // undo
-
+let info;
 $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
 
 html_radius.innerHTML = INFORMATION.radius;
@@ -691,10 +692,12 @@ $("#steps")[0].innerHTML = INFORMATION.steps;
 makeClickable();
 gameHasStarted = true;
 
-
 function moveSanta(x, y) {
+  console.log(info);
   html_map.childNodes[y].childNodes[x].classList.add("santa");
-  html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX].classList.remove("santa");
+  html_map.childNodes[INFORMATION.santaY].childNodes[
+    INFORMATION.santaX
+  ].classList.remove("santa");
 
   INFORMATION.santaX = +x;
   INFORMATION.santaY = +y;
@@ -706,23 +709,17 @@ function moveSanta(x, y) {
     $(html_map.childNodes[y].childNodes[x]).removeClass("gift");
     map[y][x] = 2;
     $(html_map.childNodes[y].childNodes[x]).addClass("road");
-    if (!$('.gift').length) {
-        $("#gameover").modal();
+    if (!$(".gift").length) {
+      $("#gameover").modal();
     }
   }
-  $("#points")[0].innerHTML = (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps; // undo
-  INFORMATION.points = (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps;
+  $("#points")[0].innerHTML =
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps; // undo
+  INFORMATION.points =
+    (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps;
+  //console.log(history, "beforehistory");
   history = history.slice(0, stepInHistory + 1);
-  history.push({
-      santaX: INFORMATION.santaX,
-      santaY: INFORMATION.santaY,
-      vector: [...INFORMATION.vector],
-      gifts: INFORMATION.gifts,
-      points: INFORMATION.points,
-      steps: INFORMATION.steps,
-      radius: INFORMATION.radius
-  });
-  stepInHistory = history.length - 1;
+  console.log(history);
 }
 
 function makeClickable() {
@@ -731,8 +728,11 @@ function makeClickable() {
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       let cell =
-        html_map?.childNodes[INFORMATION.santaY - INFORMATION.radius + INFORMATION.vector[1] + i]
-        ?.childNodes[INFORMATION.santaX - INFORMATION.radius + INFORMATION.vector[0] + j];
+        html_map?.childNodes[
+          INFORMATION.santaY - INFORMATION.radius + INFORMATION.vector[1] + i
+        ]?.childNodes[
+          INFORMATION.santaX - INFORMATION.radius + INFORMATION.vector[0] + j
+        ];
       if (
         cell &&
         map[cell.getAttribute("data-y")][cell.getAttribute("data-x")] !== 9
@@ -761,18 +761,20 @@ $(document).on($.modal.OPEN, () => {
   //location.reload();
 });
 
-
 function updateStats() {
-    $("#steps")[0].innerHTML = INFORMATION.steps;
-    $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
-    $("#points")[0].innerHTML = INFORMATION.steps ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps : 0; // undo
-    $("#gifts")[0].innerHTML = INFORMATION.gifts;
-    html_radius.innerHTML = INFORMATION.radius;
-    html_vector.innerHTML = INFORMATION.vector;
-    console.log('updated');
+  $("#steps")[0].innerHTML = INFORMATION.steps;
+  $("#santa")[0].innerHTML = `${INFORMATION.santaX}, ${INFORMATION.santaY}`;
+  $("#points")[0].innerHTML = INFORMATION.steps
+    ? (3600 * Math.pow(1.1, INFORMATION.gifts)) / INFORMATION.steps
+    : 0; // undo
+  $("#gifts")[0].innerHTML = INFORMATION.gifts;
+  html_radius.innerHTML = INFORMATION.radius;
+  html_vector.innerHTML = INFORMATION.vector;
+  console.log("updated");
 }
 
 $(".cell").on("click", function () {
+  console.log(INFORMATION);
   let x = $(this).attr("data-x");
   let y = $(this).attr("data-y");
   INFORMATION.vector[0] = x - INFORMATION.santaX;
@@ -783,30 +785,45 @@ $(".cell").on("click", function () {
   INFORMATION.steps += 1;
   moveSanta(x, y);
   INFORMATION.radius = RADIUS[map[INFORMATION.santaY][INFORMATION.santaX]];
+  history.push({
+    santaX: INFORMATION.santaX,
+    santaY: INFORMATION.santaY,
+    vector: [...INFORMATION.vector],
+    gifts: INFORMATION.gifts,
+    points: INFORMATION.points,
+    steps: INFORMATION.steps,
+    radius: INFORMATION.radius,
+  });
+  stepInHistory = history.length - 1;
+  console.log(history);
   html_radius.innerHTML = INFORMATION.radius;
   makeClickable();
 });
 
-$('#copy-json').on('click', function() {
-    let data = JSON.stringify(result);
-    let $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val(data).select();
-    document.execCommand("copy");
-    $temp.remove();
+$("#copy-json").on("click", function () {
+  let data = JSON.stringify(result);
+  let $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val(data).select();
+  document.execCommand("copy");
+  $temp.remove();
 });
 
-
-$('#undo').on('click', function() {
-    if (stepInHistory > 0) {
-        let y = INFORMATION.santaY;
-        let x = INFORMATION.santaX;
-        stepInHistory -= 1;
-        INFORMATION = history[stepInHistory];
-        updateStats();
-        clearClickable();
-        html_map.childNodes[y].childNodes[x].classList.remove("santa");
-        html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX].classList.add("santa");
-        makeClickable();
-    }
+$("#undo").on("click", function () {
+  if (stepInHistory > 0) {
+    let y = INFORMATION.santaY;
+    let x = INFORMATION.santaX;
+    stepInHistory -= 1;
+    const vector = [...history[stepInHistory].vector];
+    INFORMATION = { ...history[stepInHistory], vector };
+    result.path.pop();
+    console.log();
+    updateStats();
+    clearClickable();
+    html_map.childNodes[y].childNodes[x].classList.remove("santa");
+    html_map.childNodes[INFORMATION.santaY].childNodes[
+      INFORMATION.santaX
+    ].classList.add("santa");
+    makeClickable();
+  }
 });
