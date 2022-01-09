@@ -915,6 +915,7 @@ improveBtn.on('click', function() {
 $('#santa-deanon').on('click', function() {
   $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX])[0].scrollIntoView({
     block: 'center',
-    inline: 'center'
+    inline: 'center',
+    behavior: 'smooth'
   });
 });
