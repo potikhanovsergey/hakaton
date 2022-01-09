@@ -823,6 +823,7 @@ $("#undo").on("click", function () {
       INFORMATION.santaX
     ].classList.add("santa");
     makeClickable();
+    deanon();
   }
 });
 
@@ -849,6 +850,7 @@ $("#redo").on("click", function () {
       // map[y][x] = 2;
       $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).removeClass("gift");
     }
+    deanon();
   }
 });
 
@@ -887,6 +889,7 @@ inputBtn.on("click", function () {
   clearClickable();
   makeClickable();
   updateStats();
+  deanon();
 });
 
 const improveBtn = $('#improve-btn');
@@ -912,10 +915,12 @@ improveBtn.on('click', function() {
 });
 
 
-$('#santa-deanon').on('click', function() {
+function deanon() {
   $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX])[0].scrollIntoView({
     block: 'center',
     inline: 'center',
     behavior: 'smooth'
   });
-});
+}
+
+$('#santa-deanon').on('click', deanon)
