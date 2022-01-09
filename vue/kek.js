@@ -923,4 +923,22 @@ function deanon() {
   });
 }
 
+function teleport(step) {
+  let teleportSteps = INFORMATION.steps - step;
+  if (teleportSteps > 0) {
+    for (let i = 0; i < teleportSteps; i ++) {
+      $('#undo').click();
+    }
+  } else {
+    for (let i = 0; i < (teleportSteps * -1); i ++) {
+      $('#redo').click();
+    }
+  }
+}
+
+$('#teleport-btn').on('click', function() {
+  let step = $('#teleport-input').val();
+  teleport(step);
+});
+
 $('#santa-deanon').on('click', deanon)
