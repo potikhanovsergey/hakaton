@@ -843,10 +843,10 @@ $("#redo").on("click", function () {
     ].classList.add("santa");
     makeClickable();
     const wasGift = INFORMATION.gifts - startGifts > 0;
-    console.log(wasGift);
+
     if (wasGift) {
       $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).addClass("road");
-      map[y][x] = 2;
+      // map[y][x] = 2;
       $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX]).removeClass("gift");
     }
   }
@@ -887,4 +887,34 @@ inputBtn.on("click", function () {
   clearClickable();
   makeClickable();
   updateStats();
+});
+
+const improveBtn = $('#improve-btn');
+const improveX = $('#improve-x');
+const improveY = $('#improve-y');
+
+
+improveBtn.on('click', function() {
+  let x = improveX.val();
+  let y = improveY.val();
+  
+  if (map[y][x] === 0 || map[y][x] === 1) {
+    if (map[y][x] === 0) {
+      map[y][x] = 1;
+      html_map.childNodes[y].childNodes[x].className = 'cell snow';
+    } else {
+      map[y][x] = 2;
+      html_map.childNodes[y].childNodes[x].className = 'cell road';
+    }
+  }
+
+  result.job.push([x, y]);
+});
+
+
+$('#santa-deanon').on('click', function() {
+  $(html_map.childNodes[INFORMATION.santaY].childNodes[INFORMATION.santaX])[0].scrollIntoView({
+    block: 'center',
+    inline: 'center'
+  });
 });
